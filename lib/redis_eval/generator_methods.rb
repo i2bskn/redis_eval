@@ -5,11 +5,7 @@ module RedisEval
         when Pathname
           name
         when String, Symbol
-          path = if name =~ /\.lua$/
-            pathname(name)
-          else
-            script_path(name)
-          end
+          name =~ /\.lua$/ ? pathname(name.to_s) : script_path(name)
         else
           raise ArgumentError
         end

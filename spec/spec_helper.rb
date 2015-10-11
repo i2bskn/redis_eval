@@ -1,2 +1,7 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require 'redis_eval'
+require "bundler/setup"
+require "redis_eval"
+
+RSpec.configure do |config|
+  config.order = :random
+  config.after(:each) { RedisEval.config.reset }
+end

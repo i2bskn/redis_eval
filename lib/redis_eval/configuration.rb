@@ -22,8 +22,12 @@ module RedisEval
       reset
     end
 
-    def redis
-      @_redis ||= generate_redis_connection!
+    def redis(cache_disable: false)
+      if cache_disable
+        @_redis = generate_redis_connection!
+      else
+        @_redis ||= generate_redis_connection!
+      end
     end
 
     def configure
