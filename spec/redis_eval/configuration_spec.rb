@@ -1,9 +1,7 @@
 require "spec_helper"
 
 describe RedisEval::Configuration do
-  let(:paths) { ["/path/to/script_dir"] }
-  let(:options) { {url: "redis://localhost:6380/0"} }
-  let(:config) { RedisEval.config }
+  include_context "ConfigurationExample"
 
   describe "Accessible" do
     context "extended" do
@@ -50,14 +48,41 @@ describe RedisEval::Configuration do
   end
 
   describe "#redis" do
-    after(:each) { config.remove_instance_variable(:@_redis) }
-
-    it { expect(config.redis).to be_kind_of(Redis) }
-
-    it {
-      expect(config).to receive(:generate_redis_connection!)
-      config.redis
+    before(:each) {
+      if config.instance_variable_defined?(:@_redis)
+        config.remove_instance_variable(:@_redis)
+      end
     }
+
+    context "with cache" do
+      it { expect(config.redis).to be_kind_of(Redis) }
+
+      it {
+        expect(config).to receive(:generate_redis_connection!)
+        config.redis
+      }
+
+      it {
+        config.redis
+        expect(config).not_to receive(:generate_redis_connection!)
+        config.redis
+      }
+    end
+
+    context "without cache" do
+      it { expect(config.redis(cache_disable: true)).to be_kind_of(Redis) }
+
+      it {
+        expect(config).to receive(:generate_redis_connection!)
+        config.redis(cache_disable: true)
+      }
+
+      it {
+        config.redis(cache_disable: true)
+        expect(config).to receive(:generate_redis_connection!)
+        config.redis(cache_disable: true)
+      }
+    end
   end
 
   describe "#merge" do
@@ -81,7 +106,7 @@ describe RedisEval::Configuration do
       it {
         expect(Redis).not_to receive(:new)
         expect(Redis).to receive(:current)
-        config.redis
+        config.send(:generate_redis_connection!)
       }
     end
 
@@ -93,7 +118,7 @@ describe RedisEval::Configuration do
       it {
         expect(Redis).to receive(:new)
         expect(Redis).not_to receive(:current)
-        config.redis
+        config.send(:generate_redis_connection!)
       }
     end
   end

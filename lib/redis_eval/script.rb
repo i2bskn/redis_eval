@@ -11,16 +11,12 @@ module RedisEval
         new(name, script)
       end
 
-      def flush
-        redis.script(:flush)
-      end
-
-      def kill
-        redis.script(:kill)
-      end
-
       def load(script)
         redis.script(:load, script)
+      end
+
+      def flush
+        redis.script(:flush)
       end
 
       def redis
