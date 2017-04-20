@@ -1,33 +1,29 @@
 module RedisEval
   class Script
-    attr_reader :name, :script, :sha
+    attr_reader :script, :sha
 
     class << self
-      # @param path [Pathname]
-      # @return [RedisEval::Script]
-      def build_from_path(path)
-        name = path.basename(".*").to_s
-        script = File.read(path)
-        new(name, script)
-      end
-
-      def load(script)
-        redis.script(:load, script)
-      end
-
       def flush
         redis.script(:flush)
       end
 
       def redis
-        RedisEval.config.redis
+        Redis.current
       end
     end
 
-    def initialize(name, script)
-      @name = name
+    def initialize(script, with_load = false)
       @script = script
-      @sha = Digest::SHA1.hexdigest(script)
+      @sha    = Digest::SHA1.hexdigest(script)
+      self.load if with_load
+    end
+
+    def load
+      redis.script(:load, script)
+    end
+
+    def exist?
+      redis.script(:exists, sha)
     end
 
     def execute(keys = [], argv = [])
@@ -38,10 +34,6 @@ module RedisEval
       else
         raise
       end
-    end
-
-    def exist?
-      redis.script(:exists, sha)
     end
 
     def redis
