@@ -16,7 +16,7 @@ module RedisEval
       :script_paths,
     ].freeze
 
-    attr_accessor *VALID_OPTIONS
+    attr_accessor(*VALID_OPTIONS)
 
     def initialize
       reset
