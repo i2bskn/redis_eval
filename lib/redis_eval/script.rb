@@ -1,20 +1,11 @@
 module RedisEval
   class Script
+    attr_accessor :script_set
     attr_reader :script, :sha
 
-    class << self
-      def flush
-        redis.script(:flush)
-      end
-
-      def redis
-        Redis.current
-      end
-    end
-
-    def initialize(script, with_load = false)
-      @script = script
-      @sha    = Digest::SHA1.hexdigest(script)
+    def initialize(script, script_set: nil, with_load: true)
+      @script     = script
+      @sha        = Digest::SHA1.hexdigest(script)
       self.load if with_load
     end
 
@@ -37,7 +28,18 @@ module RedisEval
     end
 
     def redis
-      self.class.redis
+      case
+      when instance_variable_defined?(:@redis)
+        @redis
+      when !script_set.nil?
+        script_set.redis
+      else
+        Redis.current
+      end
+    end
+
+    def redis=(conn)
+      @redis = conn
     end
   end
 end

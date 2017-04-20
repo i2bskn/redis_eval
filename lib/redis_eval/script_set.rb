@@ -9,14 +9,25 @@ module RedisEval
     end
 
     def load(name)
-      loaded_scripts[name_str] ||= RedisEval::Script.new(script_path(name), true)
+      script = script_path(name).read
+      loaded_scripts[name.to_s] ||= RedisEval::Script.new(script, script_set: self)
     end
 
     def load_all_script
       src_path.children(false).each do |path|
-        name = path.basename(SCRIPT_SUFFIX).to_s
-        loaded_scripts[name] ||= RedisEval::Script.new(path.read, true)
+        name   = path.basename(SCRIPT_SUFFIX).to_s
+        script = script_path(name).read
+        loaded_scripts[name] ||= RedisEval::Script.new(script, script_set: self)
       end
+      true
+    end
+
+    def redis
+      instance_variable_defined?(:@redis) ? @redis : Redis.current
+    end
+
+    def redis=(conn)
+      @redis = conn
     end
 
     private
