@@ -3,9 +3,15 @@ module RedisEval
     attr_accessor :script_set
     attr_reader :script, :sha
 
-    def initialize(script, script_set: nil, with_load: true)
-      @script     = script
-      @sha        = Digest::SHA1.hexdigest(script)
+    def self.build_from_script_set(script, script_set, with_load: true)
+      script = new(script, with_load: with_load)
+      script.script_set = script_set
+      script
+    end
+
+    def initialize(script, with_load: true)
+      @script = script
+      @sha    = Digest::SHA1.hexdigest(script)
       self.load if with_load
     end
 

@@ -4,26 +4,27 @@ module RedisEval
 
     SCRIPT_SUFFIX = ".lua"
 
-    def initialize(path)
+    def initialize(path, conn = nil)
       @src_path = pathname(path)
+      @redis    = conn
     end
 
     def load(name)
       script = script_path(name).read
-      loaded_scripts[name.to_s] ||= RedisEval::Script.new(script, script_set: self)
+      loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_script_set(script, self)
     end
 
     def load_all_script
       src_path.children(false).each do |path|
         name   = path.basename(SCRIPT_SUFFIX).to_s
         script = script_path(name).read
-        loaded_scripts[name] ||= RedisEval::Script.new(script, script_set: self)
+        loaded_scripts[name] ||= RedisEval::Script.build_from_script_set(script, self)
       end
       true
     end
 
     def redis
-      instance_variable_defined?(:@redis) ? @redis : Redis.current
+      @redis || Redis.current
     end
 
     def redis=(conn)
