@@ -1,7 +1,7 @@
 # RedisEval
 
 [![Build Status](https://travis-ci.org/i2bskn/redis_eval.svg)](https://travis-ci.org/i2bskn/redis_eval)
-[![Coverage Status](https://coveralls.io/repos/i2bskn/redis_eval/badge.svg?branch=master&service=github)](https://coveralls.io/github/i2bskn/redis_eval?branch=master)
+[![codecov](https://codecov.io/gh/i2bskn/redis_eval/branch/master/graph/badge.svg)](https://codecov.io/gh/i2bskn/redis_eval)
 
 Evaluate Lua scripts with Redis.
 

@@ -1,17 +1,15 @@
 require "bundler/setup"
 require "simplecov"
-require "coveralls"
-
-Coveralls.wear!
-
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
-  SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter
-])
 
 SimpleCov.start do
   add_filter "test"
   add_filter ".bundle"
+end
+
+SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
+if ENV["CI"] == "true"
+  require "codecov"
+  SimpleCov.formatter = SimpleCov::Formatter::Codecov
 end
 
 require "redis_eval"
