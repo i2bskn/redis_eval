@@ -1,24 +1,24 @@
 module RedisEval
   class ScriptSet
-    attr_reader :src_path
+    attr_reader :path
 
     SCRIPT_SUFFIX = ".lua"
 
-    def initialize(path, conn = nil)
-      @src_path = pathname(path)
-      @redis    = conn
+    def initialize(target_path, conn = nil)
+      @path  = pathname(target_path)
+      @redis = conn
     end
 
     def load(name)
-      script = script_path(name).read
-      loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_script_set(script, self)
+      source = script_path(name).read
+      loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_parent(source, self)
     end
 
-    def load_all_script
-      src_path.children(false).each do |path|
-        name   = path.basename(SCRIPT_SUFFIX).to_s
-        script = script_path(name).read
-        loaded_scripts[name] ||= RedisEval::Script.build_from_script_set(script, self)
+    def load_all
+      path.children(false).each do |child|
+        name   = child.basename(SCRIPT_SUFFIX).to_s
+        source = script_path(name).read
+        loaded_scripts[name] ||= RedisEval::Script.build_from_parent(source, self)
       end
       true
     end
@@ -42,7 +42,7 @@ module RedisEval
       end
 
       def script_path(name)
-        src_path.join(name.to_s).sub_ext(SCRIPT_SUFFIX)
+        path.join(name.to_s).sub_ext(SCRIPT_SUFFIX)
       end
 
       def method_missing(name, *args, &block)

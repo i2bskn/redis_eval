@@ -1,22 +1,23 @@
 module RedisEval
   class Script
-    attr_accessor :script_set
-    attr_reader :script, :sha
+    attr_accessor :parent
+    attr_reader :source, :sha
 
-    def self.build_from_script_set(script, script_set, with_load: true)
-      script = new(script, with_load: with_load)
-      script.script_set = script_set
+    def self.build_from_parent(src, parent, with_load: true)
+      script        = new(src, with_load: with_load)
+      script.parent = parent
       script
     end
 
-    def initialize(script, with_load: true)
-      @script = script
-      @sha    = Digest::SHA1.hexdigest(script)
+    def initialize(src, with_load: true)
+      @source = src
+      @sha    = Digest::SHA1.hexdigest(@source)
+      @redis  = nil
       self.load if with_load
     end
 
     def load
-      redis.script(:load, script)
+      redis.script(:load, source)
     end
 
     def exist?
@@ -27,21 +28,15 @@ module RedisEval
       redis.evalsha(sha, Array(keys), Array(argv))
     rescue Redis::CommandError => e
       if e.message =~ /NOSCRIPT/
-        redis.eval(script, Array(keys), Array(argv))
+        redis.eval(source, Array(keys), Array(argv))
       else
         raise
       end
     end
 
     def redis
-      case
-      when instance_variable_defined?(:@redis)
-        @redis
-      when !script_set.nil?
-        script_set.redis
-      else
-        Redis.current
-      end
+      return @redis if @redis
+      parent ? parent.redis : Redis.current
     end
 
     def redis=(conn)
