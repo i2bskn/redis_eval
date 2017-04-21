@@ -4,8 +4,9 @@ module RedisEval
     attr_reader :source, :sha
 
     def self.build_from_parent(src, parent, with_load: true)
-      script        = new(src, with_load: with_load)
+      script        = new(src, with_load: false)
       script.parent = parent
+      script.load if with_load
       script
     end
 
@@ -17,11 +18,11 @@ module RedisEval
     end
 
     def load
-      redis.script(:load, source)
+      redis_without_namespace.script(:load, source)
     end
 
     def exist?
-      redis.script(:exists, sha)
+      redis_without_namespace.script(:exists, sha)
     end
 
     def execute(keys = [], argv = [])
@@ -42,5 +43,11 @@ module RedisEval
     def redis=(conn)
       @redis = conn
     end
+
+    private
+
+      def redis_without_namespace
+        defined?(Redis::Namespace) && redis.is_a?(Redis::Namespace) ? redis.redis : redis
+      end
   end
 end
