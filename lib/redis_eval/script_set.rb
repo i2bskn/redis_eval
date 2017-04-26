@@ -10,16 +10,12 @@ module RedisEval
     end
 
     def load(name)
-      source = script_path(name).read
+      source = ERB.new(script_path(name).read).result
       loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_parent(source, self)
     end
 
     def load_all
-      path.children(false).each do |child|
-        name   = child.basename(SCRIPT_SUFFIX).to_s
-        source = script_path(name).read
-        loaded_scripts[name] ||= RedisEval::Script.build_from_parent(source, self)
-      end
+      path.children(false).each { |child| self.load(child.basename(SCRIPT_SUFFIX).to_s) }
       true
     end
 

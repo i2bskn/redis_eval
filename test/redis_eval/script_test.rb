@@ -1,47 +1,47 @@
 require "test_helper"
 
 class RedisEval::ScriptTest < Minitest::Test
-  include ScriptLoader
+  include ExampleScripts
 
   def test_execute_with_initial_load
-    script = RedisEval::Script.new(hello_script)
-    assert_equal hello_script, script.source
-    assert_equal hello_script_sha, script.sha
+    script = one_script
+    assert_equal one_source, script.source
+    assert_equal one_sha, script.sha
     assert script.exist?
-    assert_equal HELLO_RETURN, script.execute
+    assert_equal 1, script.execute
   end
 
   def test_execute_without_initial_load
     Redis.current.script(:flush)
-    script = RedisEval::Script.new(hello_script, with_load: false)
-    assert_equal hello_script, script.source
-    assert_equal hello_script_sha, script.sha
+    script = one_script(false)
+    assert_equal one_source, script.source
+    assert_equal one_sha, script.sha
     refute script.exist?
-    assert_equal HELLO_RETURN, script.execute
+    assert_equal 1, script.execute
   end
 
   def test_execute_and_raise_script_error
-    script = RedisEval::Script.new(error_script)
-    assert_raises { script.execute }
+    script = RedisEval::Script.new(error_source)
+    assert_raises(Redis::CommandError) { script.execute }
   end
 
-  def test_redis_connection_switch
-    script           = RedisEval::Script.new(hello_script, with_load: false)
+  def test_switch_redis_connections
+    script           = one_script(false)
     script_set       = create_script_set
-    script_set.redis = Redis.new(db: 11)
+    script_set.redis = Redis.new(db: DATABASES[:second])
 
-    assert_equal REDIS_TEST_DB, script.redis.client.db
+    assert_equal DATABASES[:default], script.redis.client.db
 
     script.parent = script_set
-    assert_equal 11, script.redis.client.db
+    assert_equal DATABASES[:second], script.redis.client.db
 
-    script.redis = Redis.new(db: 12)
-    assert_equal 12, script.redis.client.db
+    script.redis = Redis.new(db: DATABASES[:third])
+    assert_equal DATABASES[:third], script.redis.client.db
   end
 
   def test_build_from_parent
     script_set = create_script_set
-    script     = RedisEval::Script.build_from_parent(hello_script, script_set)
+    script     = RedisEval::Script.build_from_parent(one_source, script_set)
 
     assert_kind_of RedisEval::Script, script
     assert_equal script_set, script.parent
@@ -49,7 +49,11 @@ class RedisEval::ScriptTest < Minitest::Test
 
   private
 
+    def one_script(with_load = true)
+      RedisEval::Script.new(one_source, with_load: with_load)
+    end
+
     def create_script_set
-      RedisEval::ScriptSet.new(SCRIPTS_PATH)
+      RedisEval::ScriptSet.new(BASE_PATH)
     end
 end
