@@ -1,4 +1,5 @@
 require "digest"
+require "erb"
 require "pathname"
 require "redis"
 
