@@ -13,8 +13,7 @@ module RedisEval
 
     def initialize(src, with_load: true)
       @source = src
-      @sha    = Digest::SHA1.hexdigest(@source)
-      @redis  = nil
+      @sha = Digest::SHA1.hexdigest(@source)
       self.load if with_load
     end
 
@@ -36,8 +35,9 @@ module RedisEval
 
     def redis
       return @redis if instance_variable_defined?(:@redis)
+      return parent.redis unless parent.nil?
 
-      parent&.redis || Redis.current
+      Redis.current
     end
 
     private

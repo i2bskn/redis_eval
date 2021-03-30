@@ -1,8 +1,6 @@
 require "bundler/setup"
 require "redis_eval"
-
-# Uncomment when debugging
-# require "pry"
+require "pry"
 
 Dir.glob("#{__dir__}/support/**/*.rb").sort.each { |f| require f }
 
