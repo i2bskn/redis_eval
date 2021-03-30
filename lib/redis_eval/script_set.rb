@@ -2,15 +2,15 @@ module RedisEval
   class ScriptSet
     attr_reader :path
 
-    SCRIPT_SUFFIX = ".lua"
+    SCRIPT_SUFFIX = ".lua".freeze
 
     def initialize(target_path, conn = nil)
-      @path  = pathname(target_path)
+      @path = pathname(target_path)
       @redis = conn
     end
 
     def load(name)
-      source = ERB.new(script_path(name).read).result
+      source = ERB.new(script_path(name).read).result(__binding__)
       loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_parent(source, self)
     end
 
@@ -23,9 +23,7 @@ module RedisEval
       @redis || Redis.current
     end
 
-    def redis=(conn)
-      @redis = conn
-    end
+    attr_writer :redis
 
     private
 
@@ -45,7 +43,7 @@ module RedisEval
         super unless respond_to?(name)
 
         self.load(name)
-        define_singleton_method(name) { |*a, &b| loaded_scripts[name.to_s] }
+        define_singleton_method(name) { |*_a| loaded_scripts[name.to_s] }
         send(name, *args, &block)
       end
 

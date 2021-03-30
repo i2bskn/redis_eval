@@ -2,9 +2,10 @@ module RedisEval
   class Script
     attr_accessor :parent
     attr_reader :source, :sha
+    attr_writer :redis
 
     def self.build_from_parent(src, parent, with_load: true)
-      script        = new(src, with_load: false)
+      script = new(src, with_load: false)
       script.parent = parent
       script.load if with_load
       script
@@ -12,8 +13,7 @@ module RedisEval
 
     def initialize(src, with_load: true)
       @source = src
-      @sha    = Digest::SHA1.hexdigest(@source)
-      @redis  = nil
+      @sha = Digest::SHA1.hexdigest(@source)
       self.load if with_load
     end
 
@@ -28,20 +28,16 @@ module RedisEval
     def execute(keys = [], argv = [])
       redis.evalsha(sha, Array(keys), Array(argv))
     rescue Redis::CommandError => e
-      if e.message =~ /NOSCRIPT/
-        redis.eval(source, Array(keys), Array(argv))
-      else
-        raise
-      end
+      raise unless e.message =~ /NOSCRIPT/
+
+      redis.eval(source, Array(keys), Array(argv))
     end
 
     def redis
-      return @redis if @redis
-      parent ? parent.redis : Redis.current
-    end
+      return @redis if instance_variable_defined?(:@redis)
+      return parent.redis unless parent.nil?
 
-    def redis=(conn)
-      @redis = conn
+      Redis.current
     end
 
     private
