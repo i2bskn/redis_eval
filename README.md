@@ -1,7 +1,7 @@
 # RedisEval
 
-[![Build Status](https://travis-ci.org/i2bskn/redis_eval.svg)](https://travis-ci.org/i2bskn/redis_eval)
-[![codecov](https://codecov.io/gh/i2bskn/redis_eval/branch/master/graph/badge.svg)](https://codecov.io/gh/i2bskn/redis_eval)
+[![Gem Version](https://badge.fury.io/rb/redis_eval.svg)](https://badge.fury.io/rb/redis_eval)
+[![CI](https://github.com/i2bskn/redis_eval/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/i2bskn/redis_eval/actions?query=workflow%3ACI)
 
 Evaluate Lua scripts with Redis.
 
