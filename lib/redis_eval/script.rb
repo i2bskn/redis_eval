@@ -2,9 +2,10 @@ module RedisEval
   class Script
     attr_accessor :parent
     attr_reader :source, :sha
+    attr_writer :redis
 
     def self.build_from_parent(src, parent, with_load: true)
-      script        = new(src, with_load: false)
+      script = new(src, with_load: false)
       script.parent = parent
       script.load if with_load
       script
@@ -34,12 +35,10 @@ module RedisEval
     end
 
     def redis
-      return @redis if @redis
+      return @redis if instance_variable_defined?(:@redis)
 
-      parent ? parent.redis : Redis.current
+      parent&.redis || Redis.current
     end
-
-    attr_writer :redis
 
     private
 

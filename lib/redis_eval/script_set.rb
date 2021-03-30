@@ -5,12 +5,12 @@ module RedisEval
     SCRIPT_SUFFIX = ".lua".freeze
 
     def initialize(target_path, conn = nil)
-      @path  = pathname(target_path)
+      @path = pathname(target_path)
       @redis = conn
     end
 
     def load(name)
-      source = ERB.new(script_path(name).read).result
+      source = ERB.new(script_path(name).read, nil, "-").result(__binding__)
       loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_parent(source, self)
     end
 
