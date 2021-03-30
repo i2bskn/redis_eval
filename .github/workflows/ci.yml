@@ -12,17 +12,56 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  test:
+  lint:
+    name: Rubocop
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.7.2
-    - name: Install dependencies
-      run: bundle install
-    - name: Run tests
-      run: bundle exec rake spec
-    - name: Run rubocop
-      run: bundle exec rake rubocop
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+      - name: Set up Gems
+        run: |
+          gem update --system --no-document
+          gem install bundler --no-document
+          bundle config set path .bundle
+          bundle install -j 4
+      - name: Lint
+        run: bundle exec rubocop
+  test:
+    name: Test
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.0", "2.7", "2.6"]
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Cache dependent gems
+        uses: actions/cache@v1
+        with:
+          path: .bundle
+          key: "local-bundle-ruby-${{ matrix.ruby }}-0001"
+      - name: Install dependencies
+        run: |
+          gem update --system --no-document
+          gem install bundler --no-document
+          bundle config set path .bundle
+          bundle install -j 4
+      - name: Run tests
+        run: bundle exec rspec
