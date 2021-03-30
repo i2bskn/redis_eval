@@ -64,4 +64,6 @@ jobs:
           bundle config set path .bundle
           bundle install -j 4
       - name: Run tests
+        env:
+          REDIS_HOST: redis
         run: bundle exec rspec
