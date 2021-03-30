@@ -1,0 +1,169 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.6
+  Exclude:
+    - "node_modules/**/*"
+    - "vendor/**/*"
+
+Layout/EmptyLineBetweenDefs:
+  Exclude:
+    - "lib/schema_serializer/errors.rb"
+
+# Private methods indent.
+Layout/IndentationConsistency:
+  EnforcedStyle: indented_internal_methods
+
+# Warning: 120 characters
+# Error:   160 characters
+# Make the library more restrictive.
+Layout/LineLength:
+  Max: 120
+
+# Multi-line indentation with receiver.
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented_relative_to_receiver
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*_spec.rb"
+
+# May define constants within the block in spec.
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - "spec/**/*_spec.rb"
+
+Lint/InheritException:
+  EnforcedStyle: standard_error
+
+Lint/UnderscorePrefixedVariableName:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 24
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*.rb"
+    - "Gemfile"
+    - "*.gemspec"
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/MethodLength:
+  Max: 20
+
+Security/YAMLLoad:
+  Enabled: false
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
+
+Style/AndOr:
+  EnforcedStyle: conditionals
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/CollectionMethods:
+  PreferredMethods:
+    detect: "detect"
+    find: "detect"
+    inject: "inject"
+    reduce: "inject"
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+Style/EmptyElse:
+  EnforcedStyle: empty
+
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/FormatString:
+  EnforcedStyle: percent
+
+# Do not use frozen_string_literal comment.
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/HashSyntax:
+  Exclude:
+    - "Rakefile"
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/MixinUsage:
+  Exclude:
+    - "bin/setup"
+
+# Use _ when 7 digits or more.
+Style/NumericLiterals:
+  MinDigits: 7
+  Strict: true
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/OrAssignment:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+# `has_xxx?` is more readable.
+Style/PreferredHashMethods:
+  EnforcedStyle: verbose
+
+# Do not use unnecessary returns. (Allow to return multiple values.)
+Style/RedundantReturn:
+  AllowMultipleReturnValues: true
+
+# Do not specify error class when rescuing StandardError.
+Style/RescueStandardError:
+  EnforcedStyle: implicit
+
+# String literals use double quotes.
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# String literal inside the string interpolation use double quotes too.
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# Percent(`%i(a b)`) and brackets(`[:a, :b]`) are acceptable.
+Style/SymbolArray:
+  Enabled: false
+
+# Put a trailing comma in argument list.
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+# Put a trailing comma in Array literal.
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+# Put a trailing comma in Hash literal.
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+# Percent(`%w(a b)`) and brackets(`["a", "b"]`) are acceptable.
+Style/WordArray:
+  Enabled: false

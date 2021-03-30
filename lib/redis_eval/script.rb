@@ -28,21 +28,18 @@ module RedisEval
     def execute(keys = [], argv = [])
       redis.evalsha(sha, Array(keys), Array(argv))
     rescue Redis::CommandError => e
-      if e.message =~ /NOSCRIPT/
-        redis.eval(source, Array(keys), Array(argv))
-      else
-        raise
-      end
+      raise unless e.message =~ /NOSCRIPT/
+
+      redis.eval(source, Array(keys), Array(argv))
     end
 
     def redis
       return @redis if @redis
+
       parent ? parent.redis : Redis.current
     end
 
-    def redis=(conn)
-      @redis = conn
-    end
+    attr_writer :redis
 
     private
 

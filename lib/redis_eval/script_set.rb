@@ -23,9 +23,7 @@ module RedisEval
       @redis || Redis.current
     end
 
-    def redis=(conn)
-      @redis = conn
-    end
+    attr_writer :redis
 
     private
 
@@ -45,7 +43,7 @@ module RedisEval
         super unless respond_to?(name)
 
         self.load(name)
-        define_singleton_method(name) { |*a, &b| loaded_scripts[name.to_s] }
+        define_singleton_method(name) { |*_a| loaded_scripts[name.to_s] }
         send(name, *args, &block)
       end
 

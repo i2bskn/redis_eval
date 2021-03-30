@@ -1,5 +1,5 @@
 module ExampleScripts
-  BASE_PATH = Pathname.new(File.expand_path("../../scripts", __FILE__))
+  BASE_PATH = Pathname.new(File.expand_path("../scripts", __dir__))
 
   def all_example_count
     BASE_PATH.children.size
