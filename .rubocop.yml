@@ -4,6 +4,7 @@ AllCops:
   Exclude:
     - "node_modules/**/*"
     - "vendor/**/*"
+    - "test/**/*"
 
 Layout/EmptyLineBetweenDefs:
   Exclude:

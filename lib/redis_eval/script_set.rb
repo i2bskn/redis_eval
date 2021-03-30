@@ -2,7 +2,7 @@ module RedisEval
   class ScriptSet
     attr_reader :path
 
-    SCRIPT_SUFFIX = ".lua"
+    SCRIPT_SUFFIX = ".lua".freeze
 
     def initialize(target_path, conn = nil)
       @path  = pathname(target_path)
