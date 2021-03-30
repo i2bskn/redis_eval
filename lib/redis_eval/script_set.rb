@@ -10,7 +10,7 @@ module RedisEval
     end
 
     def load(name)
-      source = ERB.new(script_path(name).read, trim_mode: nil, eoutvar: "-").result(__binding__)
+      source = ERB.new(script_path(name).read).result(__binding__)
       loaded_scripts[name.to_s] ||= RedisEval::Script.build_from_parent(source, self)
     end
 
